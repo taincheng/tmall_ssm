@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
@@ -50,6 +51,17 @@ public class CategoryController {
         uploadedImageFile.getImage().transferTo(file);
         BufferedImage image = ImageUtil.change2jpg(file);
         ImageIO.write(image,"jpg",file);
+        return "redirect:/admin_category_list";
+    }
+
+    @RequestMapping("admin_category_delete")
+    public String delete(@RequestParam int id, HttpSession session){
+        categoryService.delete(id);
+
+        File imageFolder = new File(session.getServletContext().getRealPath("img/category"));
+        File file = new File(imageFolder,id+".jpg");
+        file.delete();
+
         return "redirect:/admin_category_list";
     }
 

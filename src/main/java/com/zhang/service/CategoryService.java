@@ -28,4 +28,10 @@ public interface CategoryService {
      * @param category
      */
     void add(Category category);
+
+    /**
+     * 删除指定id的category
+     * @param id
+     */
+    void delete(int id);
 }
