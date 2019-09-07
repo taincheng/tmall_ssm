@@ -34,4 +34,17 @@ public interface CategoryService {
      * @param id
      */
     void delete(int id);
+
+    /**
+     * 查询返回该id的category对象实体
+     * @param id
+     * @return
+     */
+    Category get(int id);
+
+    /**
+     * 更新category
+     * @param category
+     */
+    void update(Category category);
 }
