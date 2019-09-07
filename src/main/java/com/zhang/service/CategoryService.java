@@ -12,16 +12,10 @@ import java.util.List;
 public interface CategoryService {
     /**
      * 分页查找Category
-     * @param page
+     * 使用了分页插件
      * @return
      */
-    List<Category> list(Page page);
-
-    /**
-     * 得到所有的category的总数total
-     * @return total
-     */
-    int total();
+    List<Category> list();
 
     /**
      * 添加新category

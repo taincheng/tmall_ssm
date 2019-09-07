@@ -11,16 +11,10 @@ import java.util.List;
  */
 public interface CategoryMapper {
     /**
-     * 得到分页的Category，
+     * 得到（分页）的Category，
      * @return List
      */
-    List<Category> list(Page page);
-
-    /**
-     * 得到category的总数total
-     * @return total
-     */
-    int total();
+    List<Category> list();
 
     /**
      * 添加新category

@@ -1,5 +1,7 @@
 package com.zhang.controller;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.zhang.pojo.Category;
 import com.zhang.service.CategoryService;
 import com.zhang.util.ImageUtil;
@@ -32,8 +34,11 @@ public class CategoryController {
 
     @RequestMapping("admin_category_list")
     public String list(ModelMap modelMap, Page page){
-        List<Category> cs = categoryService.list(page);
-        int total = categoryService.total();
+        // 通过分页插件指定分页参数
+        PageHelper.offsetPage(page.getStart(),page.getCount());
+        List<Category> cs = categoryService.list();
+        //通过PageInfo获取总数
+        int total = (int) new PageInfo<>(cs).getTotal();
         page.setTotal(total);
         modelMap.addAttribute("page",page);
         modelMap.addAttribute("cs",cs);
