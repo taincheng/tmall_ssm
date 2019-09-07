@@ -44,7 +44,7 @@
 
                 <tr>
                     <td>${c.id}</td>
-                    <td><img height="40px" src="img/category/${c.id}.jpg"></td>
+                    <td><img height="40px" src="img/category/${c.id}.jpg?temp="+<%=Math.random()%>"></td>
                     <td>${c.name}</td>
 
                     <td><a href="admin_property_list?cid=${c.id}"><span class="glyphicon glyphicon-th-list"></span></a></td>
