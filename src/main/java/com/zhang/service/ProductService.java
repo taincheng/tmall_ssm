@@ -1,5 +1,6 @@
 package com.zhang.service;
 
+import com.zhang.pojo.Category;
 import com.zhang.pojo.Product;
 
 import java.util.List;
@@ -15,6 +16,16 @@ public interface ProductService {
     Product get(int id);
     List list(int cid);
     void setFirstProductImage(Product p);
+
+    /**
+     * 为类别下的产品添加属性
+     * @param cs
+     */
+    void fill(List<Category> cs);
+
+    void fill(Category c);
+
+    void fillByRow(List<Category> cs);
 
     /**
      * 为产品设置其销量数和评价数
