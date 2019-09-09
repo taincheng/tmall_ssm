@@ -19,4 +19,11 @@ public interface UserService {
      * @return List
      */
     List<User> list();
+
+    /**
+     * 判断用户是否存在
+     * @param name
+     * @return
+     */
+    boolean isExist(String name);
 }
