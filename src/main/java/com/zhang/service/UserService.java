@@ -26,4 +26,6 @@ public interface UserService {
      * @return
      */
     boolean isExist(String name);
+
+    User get(String name, String password);
 }
