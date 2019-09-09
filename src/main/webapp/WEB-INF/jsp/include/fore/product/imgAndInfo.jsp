@@ -50,10 +50,9 @@ $(function(){
                                     if("success"==result){
                                         $(".addCartButton").html("已加入购物车");
                                         $(".addCartButton").attr("disabled","disabled");
-                                        $(".addCartButton").css("background-color","lightgray")
-                                        $(".addCartButton").css("border-color","lightgray")
+                                        $(".addCartButton").css("background-color","lightgray");
+                                        $(".addCartButton").css("border-color","lightgray");
                                         $(".addCartButton").css("color","black")
-                                         
                                     }
                                     else{
                                          
