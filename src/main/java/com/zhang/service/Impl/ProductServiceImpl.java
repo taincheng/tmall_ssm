@@ -5,9 +5,7 @@ import com.zhang.pojo.Category;
 import com.zhang.pojo.Product;
 import com.zhang.pojo.ProductExample;
 import com.zhang.pojo.ProductImage;
-import com.zhang.service.CategoryService;
-import com.zhang.service.ProductImageService;
-import com.zhang.service.ProductService;
+import com.zhang.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +24,10 @@ public class ProductServiceImpl implements ProductService{
     CategoryService categoryService;
     @Autowired
     ProductImageService productImageService;
+    @Autowired
+    OrderItemService orderItemService;
+    @Autowired
+    ReviewService reviewService;
 
     @Override
     public void add(Product product) {
@@ -84,6 +86,22 @@ public class ProductServiceImpl implements ProductService{
     public void setFirstProductImage(List<Product> ps) {
         for (Product p : ps) {
             setFirstProductImage(p);
+        }
+    }
+
+    @Override
+    public void setSaleAndReviewNumber(Product p) {
+        int saleCount = orderItemService.getSaleCount(p.getId());
+        p.setSaleCount(saleCount);
+
+        int reviewCount = reviewService.getCount(p.getId());
+        p.setReviewCount(reviewCount);
+    }
+
+    @Override
+    public void setSaleAndReviewNumber(List<Product> ps) {
+        for (Product p : ps) {
+            setSaleAndReviewNumber(p);
         }
     }
 }

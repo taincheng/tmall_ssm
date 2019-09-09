@@ -16,4 +16,12 @@ public interface ProductService {
     List list(int cid);
     void setFirstProductImage(Product p);
 
+    /**
+     * 为产品设置其销量数和评价数
+     * @param p
+     */
+    void setSaleAndReviewNumber(Product p);
+
+    void setSaleAndReviewNumber(List<Product> ps);
+
 }
