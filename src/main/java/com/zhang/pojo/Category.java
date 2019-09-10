@@ -7,7 +7,7 @@ public class Category {
 
     private String name;
 
-    /*如下是非数据库字段*/
+    //如下是非数据库字段
     private List<Product> products;
 
     private List<List<Product>> productsByRow;

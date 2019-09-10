@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
         UserExample userExample = new UserExample();
         userExample.createCriteria().andNameEqualTo(name);
         List<User> users = userMapper.selectByExample(userExample);
-        if(!users.isEmpty()){
+        if(users.isEmpty()){
             return true;
         }
         return false;

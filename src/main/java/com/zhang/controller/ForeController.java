@@ -44,6 +44,26 @@ public class ForeController {
     @Autowired
     OrderService orderService;
 
+    /**
+     * 在进入首页前，填充页面上的目录信息
+     * @param model
+     * @return
+     */
+    @RequestMapping("forehome")
+    public String home(Model model) {
+        List<Category> cs= categoryService.list();
+        productService.fill(cs);
+        productService.fillByRow(cs);
+        model.addAttribute("cs", cs);
+        return "fore/home";
+    }
+
+    /**
+     * 注册
+     * @param user
+     * @param modelMap
+     * @return
+     */
     @RequestMapping("foreregister")
     public String register(User user, ModelMap modelMap){
         String username = user.getName();
@@ -61,6 +81,14 @@ public class ForeController {
         return "redirect:registerSuccessPage";
     }
 
+    /**
+     * 登录
+     * @param name
+     * @param password
+     * @param session
+     * @param modelMap
+     * @return
+     */
     @RequestMapping("forelogin")
     public String login(@RequestParam("name")String name, @RequestParam("password")String password,
                         HttpSession session, ModelMap modelMap){
@@ -74,12 +102,23 @@ public class ForeController {
         return "redirect:forehome";
     }
 
+    /**
+     * 退出
+     * @param session
+     * @return
+     */
     @RequestMapping("forelogout")
     public String logout( HttpSession session) {
         session.removeAttribute("user");
         return "redirect:forehome";
     }
 
+    /**
+     * 去产品详情界面，填充数据
+     * @param pid
+     * @param modelMap
+     * @return
+     */
     @RequestMapping("foreproduct")
     public String product(int pid, ModelMap modelMap){
         Product product = productService.get(pid);
@@ -100,6 +139,28 @@ public class ForeController {
         return "fore/product";
     }
 
+    /**
+     * 点击购买时检测是否登录
+     * @param session
+     * @return
+     */
+    @RequestMapping("forecheckLogin")
+    @ResponseBody
+    public String checkLogin( HttpSession session) {
+        User user =(User)  session.getAttribute("user");
+        if(null!=user) {
+            return "success";
+        }
+        return "fail";
+    }
+
+    /**
+     * 模态窗口登录下，异步交互信息
+     * @param name
+     * @param password
+     * @param session
+     * @return
+     */
     @RequestMapping("foreloginAjax")
     @ResponseBody
     public String loginAjax(@RequestParam("name") String name, @RequestParam("password")String password,
