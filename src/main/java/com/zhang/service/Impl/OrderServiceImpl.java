@@ -3,11 +3,15 @@ package com.zhang.service.Impl;
 import com.zhang.mapper.OrderMapper;
 import com.zhang.pojo.Order;
 import com.zhang.pojo.OrderExample;
+import com.zhang.pojo.OrderItem;
 import com.zhang.pojo.User;
+import com.zhang.service.OrderItemService;
 import com.zhang.service.OrderService;
 import com.zhang.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -20,9 +24,10 @@ public class OrderServiceImpl implements OrderService{
 
     @Autowired
     OrderMapper orderMapper;
-
     @Autowired
     UserService userService;
+    @Autowired
+    OrderItemService orderItemService;
 
     @Override
     public void add(Order c) {
@@ -63,5 +68,34 @@ public class OrderServiceImpl implements OrderService{
         for(Order order : orders){
             setUser(order);
         }
+    }
+
+    /**
+     * 进行事务管理，出错回滚，拒绝脏数据。
+     * @param c
+     * @param ois
+     * @return
+     */
+    @Transactional(propagation = Propagation.REQUIRED, rollbackForClassName = "Exception")
+    @Override
+    public float add(Order c, List<OrderItem> ois) {
+        float total = 0;
+        //将订单添加到数据库
+        add(c);
+
+        for(OrderItem orderItem : ois){
+            orderItem.setOid(c.getId());
+            orderItemService.update(orderItem);
+            total += orderItem.getNumber() * orderItem.getProduct().getPromotePrice();
+        }
+        return total;
+    }
+
+    @Override
+    public List list(int uid, String excludedStatus) {
+        OrderExample example =new OrderExample();
+        example.createCriteria().andUidEqualTo(uid).andStatusNotEqualTo(excludedStatus);
+        example.setOrderByClause("id desc");
+        return orderMapper.selectByExample(example);
     }
 }

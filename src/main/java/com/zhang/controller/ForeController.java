@@ -3,6 +3,7 @@ package com.zhang.controller;
 import com.zhang.pojo.*;
 import com.zhang.service.*;
 import comparator.*;
+import org.apache.commons.lang.math.RandomUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,8 +14,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.HtmlUtils;
 
 import javax.servlet.http.HttpSession;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -38,6 +41,8 @@ public class ForeController {
     CategoryService categoryService;
     @Autowired
     OrderItemService orderItemService;
+    @Autowired
+    OrderService orderService;
 
     @RequestMapping("foreregister")
     public String register(User user, ModelMap modelMap){
@@ -255,6 +260,143 @@ public class ForeController {
         }
         orderItemService.delete(oiid);
         return "success";
+    }
+
+    @RequestMapping("forecreateOrder")
+    public String createOrder( Model model,Order order,HttpSession session){
+        User user =(User)  session.getAttribute("user");
+        //生成订单号
+        String orderCode = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + RandomUtils.nextInt(10000);
+        order.setOrderCode(orderCode);
+        order.setCreateDate(new Date());
+        order.setUid(user.getId());
+        order.setStatus(OrderService.waitPay);
+        List<OrderItem> ois= (List<OrderItem>)  session.getAttribute("ois");
+
+        float total =orderService.add(order,ois);
+        return "redirect:forealipay?oid="+order.getId() +"&total="+total;
+    }
+
+    @RequestMapping("forepayed")
+    public String payed(int oid, float total, Model model) {
+        Order order = orderService.get(oid);
+        order.setStatus(OrderService.waitDelivery);
+        order.setPayDate(new Date());
+        orderService.update(order);
+        model.addAttribute("o", order);
+        return "fore/payed";
+    }
+
+    @RequestMapping("forebought")
+    public String bought( Model model,HttpSession session) {
+        User user =(User)  session.getAttribute("user");
+        List<Order> os= orderService.list(user.getId(),OrderService.delete);
+
+        orderItemService.fill(os);
+
+        model.addAttribute("os", os);
+
+        return "fore/bought";
+    }
+
+    /**
+     * 确认支付功能
+     * 将订单填充数据发送给支付页面
+     * @param model
+     * @param oid
+     * @return
+     */
+    @RequestMapping("foreconfirmPay")
+    public String confirmPay( Model model,int oid) {
+        Order o = orderService.get(oid);
+        orderItemService.fill(o);
+        model.addAttribute("o", o);
+        return "fore/confirmPay";
+    }
+
+    /**
+     * 支付功能
+     * 改变订单的状态为待评价
+     * 设置支付时间。
+     * @param model
+     * @param oid
+     * @return
+     */
+    @RequestMapping("foreorderConfirmed")
+    public String orderConfirmed( Model model,int oid) {
+        Order o = orderService.get(oid);
+        o.setStatus(OrderService.waitReview);
+        o.setConfirmDate(new Date());
+        orderService.update(o);
+        return "fore/orderConfirmed";
+    }
+
+    /**
+     * 删除订单
+     * @param model
+     * @param oid
+     * @return
+     */
+    @RequestMapping("foredeleteOrder")
+    @ResponseBody
+    public String deleteOrder( Model model,int oid){
+        Order o = orderService.get(oid);
+        o.setStatus(OrderService.delete);
+        orderService.update(o);
+        return "success";
+    }
+
+    /**
+     * 去评价的页面
+     * 1.填充订单的信息
+     * 2.得到订单里的第一个产品，得到该所有评价
+     * 3.填充产品的销量和评价数
+     * @param model
+     * @param oid
+     * @return
+     */
+    @RequestMapping("forereview")
+    public String review( Model model,int oid) {
+        Order o = orderService.get(oid);
+        orderItemService.fill(o);
+        Product p = o.getOrderItems().get(0).getProduct();
+        List<Review> reviews = reviewService.list(p.getId());
+        productService.setSaleAndReviewNumber(p);
+        model.addAttribute("p", p);
+        model.addAttribute("o", o);
+        model.addAttribute("reviews", reviews);
+        return "fore/review";
+    }
+
+    /**
+     * 提交评价
+     * 1.改变订单的的状态为完成
+     * 2.评价对象中填充数据，包括评价内容，时间，和用户id，对应的产品id
+     * @param model
+     * @param session
+     * @param oid
+     * @param pid
+     * @param content
+     * @return
+     */
+    @RequestMapping("foredoreview")
+    public String doreview( Model model,HttpSession session,@RequestParam("oid") int oid,@RequestParam("pid") int pid,String content) {
+        Order o = orderService.get(oid);
+        o.setStatus(OrderService.finish);
+        orderService.update(o);
+
+        Product p = productService.get(pid);
+        content = HtmlUtils.htmlEscape(content);
+
+        User user =(User)  session.getAttribute("user");
+        Review review = new Review();
+        review.setContent(content);
+        review.setPid(pid);
+        review.setCreateDate(new Date());
+        review.setUid(user.getId());
+        reviewService.add(review);
+
+        return "redirect:forereview?oid="+oid+"&showonly=true";
     }
 }
 

@@ -1,6 +1,7 @@
 package com.zhang.service;
 
 import com.zhang.pojo.Order;
+import com.zhang.pojo.OrderItem;
 
 import java.util.List;
 
@@ -21,4 +22,20 @@ public interface OrderService {
     void update(Order c);
     Order get(int id);
     List list();
+
+    /**
+     * 生成订单order
+     * @param c
+     * @param ois
+     * @return
+     */
+    float add(Order c,List<OrderItem> ois);
+
+    /**
+     *得到用户的某种状态的订单
+     * @param uid
+     * @param excludedStatus
+     * @return
+     */
+    List list(int uid, String excludedStatus);
 }
