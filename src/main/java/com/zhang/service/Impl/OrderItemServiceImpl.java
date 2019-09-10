@@ -105,4 +105,15 @@ public class OrderItemServiceImpl implements OrderItemService{
         }
         return total;
     }
+
+    @Override
+    public List<OrderItem> listByUser(int uid) {
+        OrderItemExample example = new OrderItemExample();
+        //查找该用户的订单项，但是没有加入订单。
+        example.createCriteria().andUidEqualTo(uid).andOidIsNull();
+        example.setOrderByClause("id desc");
+        List<OrderItem> orderItems = orderItemMapper.selectByExample(example);
+        setProduct(orderItems);
+        return orderItems;
+    }
 }

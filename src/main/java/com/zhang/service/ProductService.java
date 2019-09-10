@@ -35,4 +35,10 @@ public interface ProductService {
 
     void setSaleAndReviewNumber(List<Product> ps);
 
+    /**
+     * 模糊搜索查询得到产品
+     * @param keyword
+     * @return
+     */
+    List<Product> search(String keyword);
 }
